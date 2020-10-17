@@ -49,6 +49,7 @@ RUN set -ex && \
 		netbase \
 		uuid-dev \
 		wget \
+		curl \
 		xz-utils \
 		zlib1g-dev
 
@@ -85,15 +86,7 @@ RUN strip /python/bin/python3.8 && \
 	ln /python/lib/python3.8/config-3.8-x86_64-linux-gnu/libpython3.8.a /python/lib/libpython3.8.a
 
 # install pip
-RUN set -ex; \
-	\
-	wget --no-verbose --output-document=get-pip.py "$PYTHON_GET_PIP_URL"; \
-	echo "$PYTHON_GET_PIP_SHA256 *get-pip.py" | sha256sum --check --strict -; \
-	\
-	/python/bin/python3 get-pip.py \
-		--disable-pip-version-check \
-		--no-cache-dir \
-		"pip==$PYTHON_PIP_VERSION" "wheel"
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3.8 get-pip.py
 
 # cleanup
 RUN find /python/lib -type d -a \( \
