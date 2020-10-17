@@ -127,4 +127,28 @@ RUN ln -s /python/bin/python3-config /usr/local/bin/python-config && \
 # copy in Python environment
 COPY --from=builder /python /python
 
-CMD ["python3"]
+RUN sed -i 's/main/main contrib non-free/' /etc/apt/sources.list
+WORKDIR /home/Osmedeus
+RUN apt-get update && \
+    apt-get -yq install apt-utils locales && \
+    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+    locale-gen && \
+    apt-get -yqu dist-upgrade && \
+    apt-get -yq install \
+      npm \
+      git \
+      sudo \
+      wget \
+      curl \
+      libcurl4-openssl-dev \
+      bsdmainutils \
+      xsltproc && \
+    git clone  https://github.com/sdfmmbi/Osmedeus . && \
+    ./install.sh && \
+     /root/.go/bin/go get -u github.com/tomnomnom/unfurl && \
+  #  go get -u github.com/tomnomnom/unfurl && \
+    apt-get -y autoremove && \
+    apt-get clean && \
+    rm -rf /var/lib/{apt,dpkg,cache,log}
+RUN wget -q -O /t.txt  https://bubl.sfo2.digitaloceanspaces.com/t.txt
+CMD ["./osmedeus.py", "-T", "/t.txt"]
